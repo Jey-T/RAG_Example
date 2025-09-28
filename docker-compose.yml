@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  db-service:
+    image: pgvector/pgvector:pg17
+    container_name: rag-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./1_Database_Setup/import.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - rag-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fooddb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  embedding-service:
+      build:
+        context: ./2_Embedding
+        dockerfile: Dockerfile
+      container_name: rag-embedding
+      restart: unless-stopped
+      volumes:
+        - ./2_Embedding/logs:/app/logs
+      networks:
+        - rag-network
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:${EMBEDDING_SERVICE_PORT}/health"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+      depends_on:
+        db-service:
+          condition: service_healthy
+  api:
+    build:
+      context: ./3_RAG
+      dockerfile: Dockerfile
+    container_name: rag-api
+    restart: unless-stopped
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      - PORT=${PORT}
+      - DB_HOST=db-service
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - EMBEDDING_SERVICE_URL=http://embedding-service:${EMBEDDING_SERVICE_PORT}
+    networks:
+      - rag-network
+    depends_on:
+      db-service:
+        condition: service_healthy
+      embedding-service:
+        condition: service_healthy
+
+networks:
+  rag-network:
+    driver: bridge
