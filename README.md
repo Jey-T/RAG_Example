@@ -194,8 +194,8 @@ CREATE INDEX ON recipes USING gin (metadata);
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
+| Variable | Description |
+|----------|-------------|
 | `DB_HOST` | Database hostname 
 | `DB_PORT` | Database port
 | `DB_USER` | Database username
