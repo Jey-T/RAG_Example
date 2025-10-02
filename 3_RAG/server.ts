@@ -3,6 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import { environmentSchema } from "./schemas/environment";
 import { errorHandler } from "./middlewares/errorHandler";
+import limiter from "./middlewares/rateLimitHandler";
 import healthCheck from "./handlers/health";
 import notFound from "./handlers/not-found";
 import gracefulShutdown from "./handlers/shutdown";
@@ -22,6 +23,7 @@ async function main() {
     const app = express();
     const server = createServer(app);
 
+    app.use(limiter);
     app.use(express.json());
     app.use(errorHandler);
 
