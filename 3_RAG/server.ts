@@ -18,8 +18,10 @@ async function main() {
         process.exit(1);
     }
 
+    
     const vectorStore = await createVectorStore();
     
+    const PORT = parsedEnv.data.PORT;
     const app = express();
     const server = createServer(app);
 
@@ -31,8 +33,8 @@ async function main() {
     app.get("/health", healthCheck);
     app.all("/{*any}", notFound);
 
-    server.listen(parsedEnv.data.PORT, () => {
-        console.log("Embedding service is running on port 4000");
+    server.listen(PORT, () => {
+        console.log("Embedding service is running on port " + PORT);
     });
 
     process.on('SIGTERM', () => gracefulShutdown(server, vectorStore, 'SIGTERM'));
