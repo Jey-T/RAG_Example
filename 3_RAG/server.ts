@@ -8,28 +8,28 @@ import healthCheck from "./handlers/health";
 import notFound from "./handlers/not-found";
 import gracefulShutdown from "./handlers/shutdown";
 import { createVectorStore } from "./lib/vectorStore";
-import embed from "./handlers/embed";
+import retrieve from "./handlers/retrieve";
 
 async function main() {
-    
+
     const parsedEnv = environmentSchema.safeParse(process.env);
     if (!parsedEnv.success) {
         console.error("Invalid environment variables");
         process.exit(1);
     }
 
-    
     const vectorStore = await createVectorStore();
-    
+
     const PORT = parsedEnv.data.PORT;
     const app = express();
     const server = createServer(app);
-
-    app.use(limiter);
+    
+    app.set('trust proxy', true);
     app.use(express.json());
+    app.use(limiter);
     app.use(errorHandler);
 
-    app.post("/embedding", async (req, res, next) => embed(req, res, next, vectorStore));
+    app.post("/retrieve", async (req, res, next) => retrieve(req, res, next, vectorStore));
     app.get("/health", healthCheck);
     app.all("/{*any}", notFound);
 
