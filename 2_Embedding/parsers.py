@@ -90,6 +90,7 @@ def parse_metadata(recipe: Dict[str, str], logger: logging.Logger) -> Dict[str, 
         protein = float(recipe["ProteinContent"])
 
         return {
+            "recipe_id": recipe["RecipeID"],
             "data": {"name": recipe["Name"], "category": recipe["RecipeCategory"],
             "keywords": keywords,
             "ingredients": ingredients,
