@@ -9,6 +9,7 @@ import notFound from "./handlers/not-found";
 import gracefulShutdown from "./handlers/shutdown";
 import { createVectorStore } from "./lib/vectorStore";
 import retrieve from "./handlers/retrieve";
+import cors from "cors";
 
 async function main() {
 
@@ -25,6 +26,7 @@ async function main() {
     const server = createServer(app);
     
     app.set('trust proxy', true);
+    app.use(cors());
     app.use(express.json());
     app.use(limiter);
     app.use(errorHandler);
