@@ -5,7 +5,7 @@ import { EmbeddingError, ValidationError } from "../types/error";
 import { embeddingRequestSchema } from "../schemas/embeddingInput";
 import { processResult } from "../lib/utils";
 
-export default async function embed(req: Request, res: Response, next: NextFunction, vectorStore: VectorStore) {
+export default async function retrieve(req: Request, res: Response, next: NextFunction, vectorStore: VectorStore) {
     try {
         const parsedInput = embeddingRequestSchema.safeParse(req.body);
         if (!parsedInput.success) {

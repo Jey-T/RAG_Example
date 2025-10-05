@@ -11,7 +11,6 @@ export type GraphResult = {
 export function processResult(result: GraphResult): ApiResult {
 
     const parsedResult = graphResultSchema.safeParse(result);
-
     if (!parsedResult.success) {
         throw new ValidationError(parsedResult.error.message);
     }
@@ -28,7 +27,7 @@ export function processResult(result: GraphResult): ApiResult {
                 name: recipe.metadata.name,
                 steps: recipe.metadata.n_steps,
                 ingredients: recipe.metadata.n_ingredients,
-                image,  
+                image,
                 link,
             })
         }),
